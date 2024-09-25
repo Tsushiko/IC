@@ -28,7 +28,7 @@
 	%nextL(red) = green;
 
 	%Next do processo C
-	%Começar A1 em verde
+	%ComeÃ§ar A1 em verde
 	%nextC(green,A2,A3) = yellow#green#red;
 	%nextC(A1,green,A3) = red#yellow#green;
 	%nextC(A1,A2,green) = green#red#yellow;
