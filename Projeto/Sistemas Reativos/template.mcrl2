@@ -1,0 +1,120 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DATA STRUCTURES and DEFINITIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% sort ...											% data specification 
+%sort Signal= struct green|yellow|red	;
+	 
+% cons ...											% constructors for defined sorts (define the set of elements)
+
+
+% map ...											% mappings (function signatures over elements of some type)
+%map 
+%	nextL:Signal->Signal;
+	%nextC:Signal#Signal#Signal->Signal#Signal#Signal;
+
+
+% var ... 											% variables used for pattern matching in eqn
+%var 
+%	s:StLamp; 
+%	d:Duration; 
+
+% eqn ... 											% equations (can define how a function "behave")
+%eqn 
+	%Next de processo L
+	%nextL(green) = yellow; 
+	%nextL(yellow) = red; 
+	%nextL(red) = green;
+
+	%Next do processo C
+	%Começar A1 em verde
+	%nextC(green,A2,A3) = yellow#green#red;
+	%nextC(A1,green,A3) = red#yellow#green;
+	%nextC(A1,A2,green) = green#red#yellow;
+
+
+% glob ... 											% global declarations
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ACTIONS (declarations)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% act ... 											% actions of the model and their signature
+%act pressiona, mudar,press:Duration;
+act green,yellow,red,in1,in2,in3,indeL;
+%,in1,in2,in3,a;
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PROCESSES (declarations)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% proc ...											% process definitions 
+
+proc 
+
+	Sem= green.yellow.red;
+	%L(nat:Int) =
+	% (nat == 1)->(in1.Sem.L(1))+
+	% (nat == 2)->(in2.Sem.L(2))+
+	% (nat == 3)->(in3.Sem.L(3));
+	L = indeL.Sem.L;
+
+	%A1 = L(1);
+	%A2 = L(2);
+	%A3 = L(3);
+	A1 = rename({indeL->in1},L);
+	A2 = rename({indeL->in2},L);
+	A3 = rename({indeL->in3},L);
+	C = in1.red.in2.red.in3.red.C;
+	
+	T = allow({in1|in1,in2|in2,in3|in3,green,red|red,yellow},C||A1||A2||A3);
+		
+		
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SYSTEM DEFINITION
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% init  p 					% how the system starts
+%init allow({press}, 
+%		comm({mudar|pressiona -> press}, User || L));
+init T;
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% QUICK REFERENCE (basic data types, processes, multi-actions, operations)
+
+% data types: 
+% Int, Nat, Bool (true,false), Pos (positive numbers), Real, List,...
+
+
+% multi-action: 
+% a:= tau, nome, nome(parameter data), a|a 
+
+
+% process:
+% p:= a, delta, p + p, p . p, 	% basic operators
+% 	  p || p, 					% parallel composition 
+%	  P(paremeter data) = p, 	% process definition
+
+
+% extra operators:
+% 	  c -> p <> p, c -> p  		% conditionals (if then else, if then)
+%	  sum d:D . p 		 		% summation (potential infinite choices among data values in D) 
+
+
+% Restrictions (finer control over processes) 
+
+% comm(a|a -> nome,p) 		% communication restrictions (data parameters must coincide)
+% allow({a},p) 				% allow multi-actions besides tau (data parameters can differ)
+% block({a},p)				% block an action from ocurring (renames transitions to delta, disregards data parameters)
+% rename({a->a},p)			% rename actions (disregards data parameters, maitains parmeters)
+% hide({a},p)				% hide actions (disregards data parameters)
+
+% comm < allow < hide (recommended order)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
